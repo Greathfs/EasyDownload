@@ -16,15 +16,15 @@ import java.util.List;
  */
 public class ThreadDAOImpl implements ThreadDAO {
 
-    private DBHelper mDBHelper;
+    private DatabaseHelper mDatabaseHelper;
 
     public ThreadDAOImpl(Context context) {
-        mDBHelper = new DBHelper(context);
+        mDatabaseHelper = DatabaseHelper.getInstance(context);
     }
 
     @Override
-    public void insertThread(ThreadInfo threadInfo) {
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+    public synchronized void insertThread(ThreadInfo threadInfo) {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
         db.execSQL("insert into thread_info(thread_id,url,start,end,finished) values(?,?,?,?,?)",
                 new Object[]{threadInfo.getId(),threadInfo.getUrl(),threadInfo.getStart(),threadInfo.getEnd(),threadInfo.getFinished()});
 
@@ -32,17 +32,17 @@ public class ThreadDAOImpl implements ThreadDAO {
     }
 
     @Override
-    public void deleteThread(String url, int threadId) {
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        db.execSQL("delete from thread_info where url = ? and thread_id = ?",
-                new Object[]{url,threadId});
+    public synchronized void deleteThread(String url) {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+        db.execSQL("delete from thread_info where url = ? ",
+                new Object[]{url});
 
         db.close();
     }
 
     @Override
-    public void upgradeThread(String url, int threadId, long finished) {
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+    public synchronized void upgradeThread(String url, int threadId, long finished) {
+        SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
         db.execSQL("update thread_info  set finished = ? where url = ? and thread_id = ?",
                 new Object[]{finished,url,threadId});
 
@@ -52,7 +52,7 @@ public class ThreadDAOImpl implements ThreadDAO {
     @Override
     public List<ThreadInfo> getThreads(String url) {
 
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
         List<ThreadInfo> list = new ArrayList<>();
         Cursor cursor = db.rawQuery("select * from thread_info where url = ?", new String[]{url});
         while (cursor.moveToNext()) {
@@ -72,13 +72,24 @@ public class ThreadDAOImpl implements ThreadDAO {
     @Override
     public boolean isExists(String url, int threadId) {
 
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from thread_info where url = ? and thread_id = ?",
-                new String[]{url, String.valueOf(threadId)});
+        boolean flag = false;
 
-        boolean isExist = cursor.moveToNext();
-        cursor.close();
-        db.close();
-        return isExist;
+        SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+
+            cursor = db.rawQuery("select * from thread_info where url = ? and thread_id = ?",
+                    new String[]{url, String.valueOf(threadId)});
+
+            flag = cursor.moveToNext();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            cursor.close();
+            db.close();
+        }
+
+        return flag;
     }
 }

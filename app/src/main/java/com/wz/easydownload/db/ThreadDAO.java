@@ -23,7 +23,7 @@ public interface ThreadDAO {
      * @param url
      * @param threadId
      */
-    void deleteThread(String url, int threadId);
+    void deleteThread(String url);
 
     /**
      * 更新下载进度

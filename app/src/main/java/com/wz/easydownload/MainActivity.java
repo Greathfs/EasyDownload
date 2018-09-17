@@ -6,28 +6,28 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.wz.easydownload.bean.FileInfo;
 import com.wz.easydownload.service.DownloadService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private TextView mTvFileName;
-    private ProgressBar mPbProgress;
-    private Button mBtnStart;
-    private Button mbtnStop;
+    private RecyclerView mRecyclerView;
+    private List<FileInfo> mFileList;
+    private DownloadAdapter mDownloadAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.item_down);
+        setContentView(R.layout.activity_main);
 
         initData();
         initView();
@@ -39,43 +39,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mTvFileName = findViewById(R.id.tv_item_title);
-        mPbProgress = findViewById(R.id.pb_item_progress);
-        mBtnStart = findViewById(R.id.btn_start);
-        mbtnStop = findViewById(R.id.btn_stop);
+        mRecyclerView = findViewById(R.id.rv_main);
 
-        mPbProgress.setMax(100);
+        //创建集合
+        mFileList = new ArrayList<>();
 
         //创建文件信息
-        final FileInfo fileInfo = new FileInfo(0,
+        FileInfo fileInfo = new FileInfo(0,
                 "http://files.huitui.wizhong.com/media?file=1389f4a5-7b79-4e00-9722-d53168d6108a&type=media_stream&time=1536654530218",
-                "会推测试", 0, 0);
+                "碟中谍6", 0, 0);
+        FileInfo fileInfo1 = new FileInfo(1,
+                "http://files.huitui.wizhong.com/media?file=1389f4a5-7b79-4e00-9722-d53168d6108a&type=media_stream&time=1536654530218",
+                "王牌对王牌", 0, 0);
+        FileInfo fileInfo2 = new FileInfo(2,
+                "http://files.huitui.wizhong.com/media?file=2542e618-adfb-4d3b-9386-b55b3d2c0a1b&type=media_stream&time=1536828789901",
+                "我就是演员", 0, 0);
 
-        mBtnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //给Service传递参数
-                Intent intent = new Intent(MainActivity.this, DownloadService.class);
-                intent.setAction(DownloadService.ACTION_START);
-                intent.putExtra("fileInfo", fileInfo);
-                startService(intent);
-            }
-        });
+        mFileList.add(fileInfo);
+        mFileList.add(fileInfo1);
+        mFileList.add(fileInfo2);
 
-        mbtnStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //给Service传递参数
-                Intent intent = new Intent(MainActivity.this, DownloadService.class);
-                intent.setAction(DownloadService.ACTION_STOP);
-                intent.putExtra("fileInfo", fileInfo);
-                startService(intent);
-            }
-        });
+        mDownloadAdapter = new DownloadAdapter(this, mFileList);
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(mDownloadAdapter);
 
         //注册广播
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(DownloadService.ACTION_UPDARE);
+        intentFilter.addAction(DownloadService.ACTION_UPDATE);
+        //添加新的action
+        intentFilter.addAction(DownloadService.ACTION_FINISH);
         registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
@@ -93,10 +86,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (DownloadService.ACTION_UPDARE.equals(intent.getAction())) {
+            if (DownloadService.ACTION_UPDATE.equals(intent.getAction())) {
+                //更新进度
                 long finished = intent.getLongExtra("finished", 0);
-                Log.d(TAG, "onReceive: finished=" + finished);
-                mPbProgress.setProgress((int) finished);
+                int id = intent.getIntExtra("id", 0);
+                mDownloadAdapter.updateProgress(id, (int) finished);
+            } else if (DownloadService.ACTION_FINISH.equals(intent.getAction())) {
+                //结束
+                FileInfo fileInfo = (FileInfo) intent.getSerializableExtra("fileInfo");
+                mDownloadAdapter.updateProgress(fileInfo.getId(), 0);
+                Log.d(TAG, "onReceive: " + fileInfo.getFileName() + "  下载完成!");
             }
 
         }

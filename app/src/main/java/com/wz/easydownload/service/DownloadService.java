@@ -1,5 +1,6 @@
 package com.wz.easydownload.service;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
@@ -15,6 +16,9 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author HuangFusheng
@@ -24,14 +28,37 @@ import java.net.URL;
 public class DownloadService extends Service {
     private static final String TAG = "DownloadService";
 
+    /**
+     * 下载路径
+     */
     public static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
             + "/download/";
+    /**
+     * 开始下载命令
+     */
     public static final String ACTION_START = "ACTION_START";
+    /**
+     * 结束下载命令
+     */
     public static final String ACTION_STOP = "ACTION_STOP";
-    public static final String ACTION_UPDARE = "ACTION_UPDATE";
-
+    /**
+     * 更新UI命令
+     */
+    public static final String ACTION_UPDATE = "ACTION_UPDATE";
+    /**
+     * 下载完成
+     */
+    public static final String ACTION_FINISH = "ACTION_FINISH";
+    /**
+     * 初始化标识
+     */
     public static final int MSG_INIT = 0;
-    private DownloadTask mDownloadTask;
+    /**
+     * 下载任务集合
+     */
+    private Map<Integer, DownloadTask> mTasks = new LinkedHashMap<>();
+
+    private InitThread mInitThread;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -40,12 +67,17 @@ public class DownloadService extends Service {
             FileInfo fileInfo = (FileInfo) intent.getSerializableExtra("fileInfo");
             Log.d(TAG, "START fileInfo: " + fileInfo.toString());
             //启动初始化线程
-            new InitThread(fileInfo).start();
+            mInitThread =new InitThread(fileInfo);
+            DownloadTask.sExecutorService.execute(mInitThread);
+
         } else if (ACTION_STOP.equals(intent.getAction())) {
             FileInfo fileInfo = (FileInfo) intent.getSerializableExtra("fileInfo");
             Log.d(TAG, "STOP fileInfo: " + fileInfo.toString());
-            if (mDownloadTask != null) {
-                mDownloadTask.isPause = true;
+            //从集合中取出下载任务
+            DownloadTask downloadTask = mTasks.get(fileInfo.getId());
+            if (downloadTask != null) {
+                //停止下载
+                downloadTask.isPause = true;
             }
         }
 
@@ -59,6 +91,7 @@ public class DownloadService extends Service {
     }
 
 
+    @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -68,8 +101,10 @@ public class DownloadService extends Service {
                     FileInfo fileInfo = (FileInfo) msg.obj;
                     Log.d(TAG, "handleMessage: " + fileInfo.toString());
                     //启动下载任务
-                    mDownloadTask = new DownloadTask(DownloadService.this, fileInfo);
-                    mDownloadTask.download();
+                    DownloadTask downloadTask = new DownloadTask(DownloadService.this, fileInfo,3);
+                    downloadTask.download();
+                    //吧下载任务添加到集合中
+                    mTasks.put(fileInfo.getId(), downloadTask);
                     break;
                 default:
                     break;
@@ -99,7 +134,7 @@ public class DownloadService extends Service {
                 //连接网络文件
                 URL url = new URL(mFileInfo.getUrl());
                 connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(3000);
+                connection.setConnectTimeout(30000);
                 connection.setRequestMethod("GET");
                 long length = -1;
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
