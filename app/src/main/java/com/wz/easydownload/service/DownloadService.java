@@ -1,4 +1,4 @@
-package com.wz.easydownlaod.service;
+package com.wz.easydownload.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.wz.easydownlaod.bean.FileInfo;
+import com.wz.easydownload.bean.FileInfo;
 
 import java.io.File;
 import java.io.RandomAccessFile;

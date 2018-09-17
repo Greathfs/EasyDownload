@@ -1,27 +1,29 @@
-package com.wz.easydownlaod.bean;
+package com.wz.easydownload.bean;
+
+import java.io.Serializable;
 
 /**
  * @author HuangFusheng
  * @date 2018/9/17
- * @description 线程信息
+ * @description 文件信息
  */
-public class ThreadInfo {
+public class FileInfo implements Serializable{
 
     private int id;
     private String url;
-    private long start;
-    private long end;
+    private String fileName;
+    private long length;
     private long finished;
 
-    public ThreadInfo() {
+    public FileInfo() {
 
     }
 
-    public ThreadInfo(int id, String url, long start, long end, long finished) {
+    public FileInfo(int id, String url, String fileName, long length, long finished) {
         this.id = id;
         this.url = url;
-        this.start = start;
-        this.end = end;
+        this.fileName = fileName;
+        this.length = length;
         this.finished = finished;
     }
 
@@ -41,20 +43,20 @@ public class ThreadInfo {
         this.url = url;
     }
 
-    public long getStart() {
-        return start;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setStart(long start) {
-        this.start = start;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public long getEnd() {
-        return end;
+    public long getLength() {
+        return length;
     }
 
-    public void setEnd(long end) {
-        this.end = end;
+    public void setLength(long length) {
+        this.length = length;
     }
 
     public long getFinished() {
@@ -67,11 +69,11 @@ public class ThreadInfo {
 
     @Override
     public String toString() {
-        return "ThreadInfo{" +
+        return "FileInfo{" +
                 "id=" + id +
                 ", url='" + url + '\'' +
-                ", start=" + start +
-                ", end=" + end +
+                ", fileName='" + fileName + '\'' +
+                ", length=" + length +
                 ", finished=" + finished +
                 '}';
     }

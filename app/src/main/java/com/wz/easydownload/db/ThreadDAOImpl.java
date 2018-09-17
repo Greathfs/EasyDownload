@@ -1,10 +1,10 @@
-package com.wz.easydownlaod.db;
+package com.wz.easydownload.db;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.wz.easydownlaod.bean.ThreadInfo;
+import com.wz.easydownload.bean.ThreadInfo;
 
 import java.util.ArrayList;
 import java.util.List;

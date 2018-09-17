@@ -1,12 +1,12 @@
-package com.wz.easydownlaod.service;
+package com.wz.easydownload.service;
 
 import android.content.Context;
 import android.content.Intent;
 
-import com.wz.easydownlaod.bean.FileInfo;
-import com.wz.easydownlaod.bean.ThreadInfo;
-import com.wz.easydownlaod.db.ThreadDAO;
-import com.wz.easydownlaod.db.ThreadDAOImpl;
+import com.wz.easydownload.bean.FileInfo;
+import com.wz.easydownload.bean.ThreadInfo;
+import com.wz.easydownload.db.ThreadDAO;
+import com.wz.easydownload.db.ThreadDAOImpl;
 
 import java.io.File;
 import java.io.IOException;

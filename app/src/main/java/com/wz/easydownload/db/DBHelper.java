@@ -1,4 +1,4 @@
-package com.wz.easydownlaod.db;
+package com.wz.easydownload.db;
 
 import android.content.Context;
 import android.database.DatabaseErrorHandler;

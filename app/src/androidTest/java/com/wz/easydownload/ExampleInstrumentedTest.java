@@ -1,4 +1,4 @@
-package com.wz.easydownlaod;
+package com.wz.easydownload;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

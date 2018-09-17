@@ -1,4 +1,4 @@
-package com.wz.easydownlaod;
+package com.wz.easydownload;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,8 +12,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.wz.easydownlaod.bean.FileInfo;
-import com.wz.easydownlaod.service.DownloadService;
+import com.wz.easydownload.bean.FileInfo;
+import com.wz.easydownload.service.DownloadService;
 
 public class MainActivity extends AppCompatActivity {
 

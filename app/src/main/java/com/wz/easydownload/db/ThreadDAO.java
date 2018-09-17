@@ -1,6 +1,6 @@
-package com.wz.easydownlaod.db;
+package com.wz.easydownload.db;
 
-import com.wz.easydownlaod.bean.ThreadInfo;
+import com.wz.easydownload.bean.ThreadInfo;
 
 import java.util.List;
 

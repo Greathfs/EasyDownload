@@ -1,4 +1,4 @@
-package com.wz.easydownlaod;
+package com.wz.easydownload;
 
 import org.junit.Test;
 

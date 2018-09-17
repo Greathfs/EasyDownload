@@ -1,29 +1,27 @@
-package com.wz.easydownlaod.bean;
-
-import java.io.Serializable;
+package com.wz.easydownload.bean;
 
 /**
  * @author HuangFusheng
  * @date 2018/9/17
- * @description 文件信息
+ * @description 线程信息
  */
-public class FileInfo implements Serializable{
+public class ThreadInfo {
 
     private int id;
     private String url;
-    private String fileName;
-    private long length;
+    private long start;
+    private long end;
     private long finished;
 
-    public FileInfo() {
+    public ThreadInfo() {
 
     }
 
-    public FileInfo(int id, String url, String fileName, long length, long finished) {
+    public ThreadInfo(int id, String url, long start, long end, long finished) {
         this.id = id;
         this.url = url;
-        this.fileName = fileName;
-        this.length = length;
+        this.start = start;
+        this.end = end;
         this.finished = finished;
     }
 
@@ -43,20 +41,20 @@ public class FileInfo implements Serializable{
         this.url = url;
     }
 
-    public String getFileName() {
-        return fileName;
+    public long getStart() {
+        return start;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setStart(long start) {
+        this.start = start;
     }
 
-    public long getLength() {
-        return length;
+    public long getEnd() {
+        return end;
     }
 
-    public void setLength(long length) {
-        this.length = length;
+    public void setEnd(long end) {
+        this.end = end;
     }
 
     public long getFinished() {
@@ -69,11 +67,11 @@ public class FileInfo implements Serializable{
 
     @Override
     public String toString() {
-        return "FileInfo{" +
+        return "ThreadInfo{" +
                 "id=" + id +
                 ", url='" + url + '\'' +
-                ", fileName='" + fileName + '\'' +
-                ", length=" + length +
+                ", start=" + start +
+                ", end=" + end +
                 ", finished=" + finished +
                 '}';
     }
